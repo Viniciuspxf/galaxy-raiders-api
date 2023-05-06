@@ -2,6 +2,7 @@
 package galaxyraiders.core.physics
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import kotlin.math.*
 
 @JsonIgnoreProperties("unit", "normal", "degree", "magnitude")
 data class Vector2D(val dx: Double, val dy: Double) {
@@ -10,30 +11,30 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   val magnitude: Double
-    get() = INVALID_DOUBLE
+    get() = sqrt(this * this)
 
   val radiant: Double
-    get() = INVALID_DOUBLE
+    get() = acos(dx / magnitude)* sign(dy)
 
   val degree: Double
-    get() = INVALID_DOUBLE
+    get() = radiant*180 / Math.PI
 
   val unit: Vector2D
-    get() = INVALID_VECTOR
+    get() = this / magnitude
 
   val normal: Vector2D
     get() = INVALID_VECTOR
 
   operator fun times(scalar: Double): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(dx * scalar, dy * scalar)
   }
 
   operator fun div(scalar: Double): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(dx / scalar, dy / scalar)
   }
 
   operator fun times(v: Vector2D): Double {
-    return INVALID_DOUBLE
+    return dx * v.dx + dy * v.dy
   }
 
   operator fun plus(v: Vector2D): Vector2D {
@@ -45,7 +46,7 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   operator fun unaryMinus(): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(-dx, -dy)
   }
 
   operator fun minus(v: Vector2D): Vector2D {
