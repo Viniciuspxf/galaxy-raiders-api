@@ -1,4 +1,3 @@
-@file:Suppress("UNUSED_PARAMETER") // <- REMOVE
 package galaxyraiders.core.physics
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -23,7 +22,7 @@ data class Vector2D(val dx: Double, val dy: Double) {
     get() = this / magnitude
 
   val normal: Vector2D
-    get() = INVALID_VECTOR
+    get() = Vector2D(1.0, -dx/dy).unit * sign(dy)
 
   operator fun times(scalar: Double): Vector2D {
     return Vector2D(dx * scalar, dy * scalar)
@@ -38,11 +37,11 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   operator fun plus(v: Vector2D): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(dx + v.dx , dy + v.dy)
   }
 
   operator fun plus(p: Point2D): Point2D {
-    return INVALID_POINT
+    return Point2D(p.x + dx, p.y + dy)
   }
 
   operator fun unaryMinus(): Vector2D {
@@ -50,18 +49,18 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   operator fun minus(v: Vector2D): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(dx - v.dx, dy - v.dy)
   }
 
   fun scalarProject(target: Vector2D): Double {
-    return INVALID_DOUBLE
+    return this * target.unit
   }
 
   fun vectorProject(target: Vector2D): Vector2D {
-    return INVALID_VECTOR
+    return this.scalarProject(target) * target.unit
   }
 }
 
 operator fun Double.times(v: Vector2D): Vector2D {
-  return INVALID_VECTOR
+  return v * this
 }
