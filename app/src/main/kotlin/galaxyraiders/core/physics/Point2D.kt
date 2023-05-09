@@ -1,4 +1,3 @@
-@file:Suppress("UNUSED_PARAMETER") // <- REMOVE
 package galaxyraiders.core.physics
 
 data class Point2D(val x: Double, val y: Double) {
@@ -23,18 +22,18 @@ data class Point2D(val x: Double, val y: Double) {
   }
 
   fun impactDirection(p: Point2D): Vector2D {
-    return INVALID_VECTOR
+    return this.impactVector(p).unit
   }
 
   fun contactVector(p: Point2D): Vector2D {
-    return INVALID_VECTOR
+    return impactVector(p).normal
   }
 
   fun contactDirection(p: Point2D): Vector2D {
-    return INVALID_VECTOR
+    return contactVector(p)
   }
 
   fun distance(p: Point2D): Double {
-    return INVALID_DOUBLE
+    return (this.toVector() - p.toVector()).magnitude
   }
 }
