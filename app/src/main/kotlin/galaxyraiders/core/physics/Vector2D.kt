@@ -13,7 +13,7 @@ data class Vector2D(val dx: Double, val dy: Double) {
     get() = sqrt(this * this)
 
   val radiant: Double
-    get() = acos(dx / magnitude)* sign(dy)
+    get() = acos(dx / magnitude) * sign(dy)
 
   val degree: Double
     get() = radiant*180 / Math.PI
@@ -45,7 +45,7 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   operator fun unaryMinus(): Vector2D {
-    return Vector2D(-dx, -dy)
+    return -1.0 * Vector2D(dx, dy)
   }
 
   operator fun minus(v: Vector2D): Vector2D {
