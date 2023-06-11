@@ -32,6 +32,9 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
 
   val ship = initializeShip()
 
+  var explosions: List<Explosion> = emptyList()
+    private set
+
   var missiles: List<Missile> = emptyList()
     private set
 
@@ -61,6 +64,16 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     this.asteroids += this.createAsteroidWithRandomProperties()
   }
 
+  fun generateExplosion(firstObject: SpaceObject, secondObject: SpaceObject) {
+    var explosionRadius : Double = firstObject.radius + secondObject.radius
+    var explosionCenter : Point2D = (firstObject.center + secondObject.center) / 2.0
+
+    this.explosions += this.createExplosion(explosionCenter, explosionRadius)
+  }
+  fun cleanExplosions() {
+    this.explosions = emptyList()
+  }
+
   fun trimMissiles() {
     this.missiles = this.missiles.filter {
       it.inBoundaries(this.boundaryX, this.boundaryY)
@@ -88,6 +101,10 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
 
   private fun standardShipVelocity(): Vector2D {
     return Vector2D(dx = 0.0, dy = 0.0)
+  }
+
+  private fun createExplosion(center: Point2D, radius: Double): Explosion {
+    return Explosion(center, radius)
   }
 
   private fun createMissile(): Missile {

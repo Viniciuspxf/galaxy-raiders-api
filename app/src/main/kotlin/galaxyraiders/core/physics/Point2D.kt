@@ -9,6 +9,10 @@ data class Point2D(val x: Double, val y: Double) {
     return Point2D(x + v.dx, y + v.dy)
   }
 
+  operator fun div(scalar: Double): Point2D {
+    return Point2D(x / scalar, y / scalar)
+  }
+
   override fun toString(): String {
     return "Point2D(x=$x, y=$y)"
   }
