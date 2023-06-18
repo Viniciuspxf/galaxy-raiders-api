@@ -1,6 +1,7 @@
 package galaxyraiders.core.game
 
 import galaxyraiders.Config
+import galaxyraiders.core.score.ScoreManager
 import galaxyraiders.ports.RandomGenerator
 import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand
@@ -26,6 +27,7 @@ class GameEngine(
   val generator: RandomGenerator,
   val controller: Controller,
   val visualizer: Visualizer,
+  val scoreManager: ScoreManager,
 ) {
   val field = SpaceField(
     width = GameEngineConfig.spaceFieldWidth,
@@ -91,8 +93,16 @@ class GameEngine(
       if (first.impacts(second)) {
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
         this.field.generateExplosion(first, second)
+        this.addPoints(first, second)
       }
     }
+  }
+
+  fun addPoints(first: SpaceObject, second: SpaceObject) {
+    if (first.type == "Asteroid" && second.type == "Missile")
+      scoreManager.addAsteroidHitPoints(first as Asteroid)
+    else if (first.type ==  "Missile" && second.type == "Asteroid")
+      scoreManager.addAsteroidHitPoints(second as Asteroid)
   }
 
   fun moveSpaceObjects() {
