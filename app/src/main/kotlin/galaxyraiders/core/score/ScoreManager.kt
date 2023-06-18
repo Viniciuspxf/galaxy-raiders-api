@@ -3,6 +3,7 @@ package galaxyraiders.core.score
 import com.fasterxml.jackson.databind.ObjectMapper
 import galaxyraiders.core.game.Asteroid
 import java.io.File
+import java.io.FileNotFoundException
 
 class ScoreManager() {
 
@@ -16,9 +17,17 @@ class ScoreManager() {
 
   init {
     val objectMapper = ObjectMapper()
-    this.scoreboard = objectMapper.readValue(scoreboardFile, objectMapper.typeFactory.constructCollectionType(
-      MutableList::class.java, ScoreDTO::class.java))
+
+    try {
+      this.scoreboard = objectMapper.readValue(scoreboardFile, objectMapper.typeFactory.constructCollectionType(
+        MutableList::class.java, ScoreDTO::class.java))
+    }
+    catch (exception: FileNotFoundException) {
+      scoreboard = emptyList()
+    }
+
     this.scoreboard += currentGameScore
+    saveScoreboard()
   }
 
   fun addAsteroidHitPoints(asteroid: Asteroid) {
@@ -31,8 +40,9 @@ class ScoreManager() {
 
   private fun saveLeaderboard() {
     val objectMapper = ObjectMapper()
-
-    objectMapper.writeValue(leaderboardFile, scoreboard.sortedByDescending { it.points }.slice(0..2))
+    val sortedScoreboard = scoreboard.sortedByDescending { it.points }
+    val leaderboard = if (scoreboard.size > 2) sortedScoreboard.slice(0..2) else scoreboard
+    objectMapper.writeValue(leaderboardFile, leaderboard)
   }
 
   private fun saveScoreboard() {
