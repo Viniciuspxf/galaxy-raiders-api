@@ -11,11 +11,19 @@ class ScoreManager() {
 
   var scoreboard: List<ScoreDTO>
 
-  var scoreboardFile = File("app/src/main/kotlin/galaxyraiders/core/score/Scoreboard.json")
+  var scoreboardFile: File
 
-  var leaderboardFile = File("app/src/main/kotlin/galaxyraiders/core/score/Leaderboard.json")
+  var leaderboardFile: File
 
   init {
+    val scoreFolder = File("core/score/")
+
+    scoreFolder.mkdirs()
+
+    this.scoreboardFile = File(scoreFolder, "Scoreboard.json")
+    this.leaderboardFile = File(scoreFolder, "Leaderboard.json")
+
+
     val objectMapper = ObjectMapper()
 
     try {
