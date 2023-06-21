@@ -92,17 +92,30 @@ class GameEngine(
         (first, second) ->
       if (first.impacts(second)) {
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
-        this.field.generateExplosion(first, second)
-        this.addPoints(first, second)
+        this.handleAsteroidDestruction(first, second)
       }
     }
   }
 
-  fun addPoints(first: SpaceObject, second: SpaceObject) {
+
+  // TODO: remove asteroids and missiles that collide
+  // TODO: make explosion last 5 seconds
+  // TODO: make explosion move
+  // TODO improve Score DTO
+  fun handleAsteroidDestruction(first: SpaceObject, second: SpaceObject) {
+    var asteroid: Asteroid? = null
+
     if (first.type == "Asteroid" && second.type == "Missile")
-      scoreManager.addAsteroidHitPoints(first as Asteroid)
+      asteroid = first as Asteroid
     else if (first.type ==  "Missile" && second.type == "Asteroid")
-      scoreManager.addAsteroidHitPoints(second as Asteroid)
+      asteroid = second as Asteroid
+
+    if (asteroid != null) {
+      this.scoreManager.addAsteroidHitPoints(asteroid)
+      this.field.generateExplosion(asteroid)
+      first.destroy()
+      second.destroy()
+    }
   }
 
   fun moveSpaceObjects() {

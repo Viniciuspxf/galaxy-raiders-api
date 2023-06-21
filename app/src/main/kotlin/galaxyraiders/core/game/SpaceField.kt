@@ -64,25 +64,24 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     this.asteroids += this.createAsteroidWithRandomProperties()
   }
 
-  fun generateExplosion(firstObject: SpaceObject, secondObject: SpaceObject) {
-    var explosionRadius : Double = firstObject.radius + secondObject.radius
-    var explosionCenter : Point2D = (firstObject.center + secondObject.center) / 2.0
-
-    this.explosions += this.createExplosion(explosionCenter, explosionRadius)
+  fun generateExplosion(asteroid: Asteroid) {
+    this.explosions += this.createExplosion(asteroid.center, asteroid.velocity, asteroid.radius)
   }
   fun cleanExplosions() {
-    this.explosions = emptyList()
+    this.explosions = this.explosions.filter {
+      it.inBoundaries(this.boundaryX, this.boundaryY) and !it.expired
+    }
   }
 
   fun trimMissiles() {
     this.missiles = this.missiles.filter {
-      it.inBoundaries(this.boundaryX, this.boundaryY)
+      it.inBoundaries(this.boundaryX, this.boundaryY) and !it.destroyed
     }
   }
 
   fun trimAsteroids() {
     this.asteroids = this.asteroids.filter {
-      it.inBoundaries(this.boundaryX, this.boundaryY)
+      it.inBoundaries(this.boundaryX, this.boundaryY) and !it.destroyed
     }
   }
 
@@ -103,8 +102,8 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     return Vector2D(dx = 0.0, dy = 0.0)
   }
 
-  private fun createExplosion(center: Point2D, radius: Double): Explosion {
-    return Explosion(center, radius)
+  private fun createExplosion(center: Point2D, velocity: Vector2D, radius: Double): Explosion {
+    return Explosion(center, velocity, radius)
   }
 
   private fun createMissile(): Missile {

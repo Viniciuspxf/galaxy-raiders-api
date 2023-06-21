@@ -13,8 +13,16 @@ open class SpaceObject(
   mass: Double
 ) :
   Object2D(initialPosition, initialVelocity, radius, mass) {
+
+  var destroyed = false
+    private set
+
   override fun toString(): String {
     return "${this.type} at ${this.center}"
+  }
+
+  fun destroy() {
+    destroyed = true
   }
 
   fun inBoundaries(
