@@ -97,11 +97,6 @@ class GameEngine(
     }
   }
 
-
-  // TODO: remove asteroids and missiles that collide
-  // TODO: make explosion last 5 seconds
-  // TODO: make explosion move
-  // TODO improve Score DTO
   fun handleAsteroidDestruction(first: SpaceObject, second: SpaceObject) {
     var asteroid: Asteroid? = null
 
@@ -122,6 +117,7 @@ class GameEngine(
     this.field.moveShip()
     this.field.moveAsteroids()
     this.field.moveMissiles()
+    this.field.moveExplosions()
   }
 
   fun cleanExplosions() {

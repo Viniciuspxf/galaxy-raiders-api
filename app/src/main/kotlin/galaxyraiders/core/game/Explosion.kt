@@ -17,6 +17,6 @@ class Explosion(
   var startDateTime: LocalDateTime = LocalDateTime.now()
   val expired: Boolean
     get() {
-      return Duration.between(startDateTime, LocalDateTime.now()).seconds < 10
+      return Duration.between(startDateTime, LocalDateTime.now()).seconds > 5
     }
 }
