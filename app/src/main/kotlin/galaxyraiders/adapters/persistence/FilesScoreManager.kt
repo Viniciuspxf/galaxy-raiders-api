@@ -1,11 +1,13 @@
-package galaxyraiders.core.score
+package galaxyraiders.adapters.persistence
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import galaxyraiders.core.game.Asteroid
+import galaxyraiders.core.score.ScoreDTO
+import galaxyraiders.ports.persistence.ScoreManager
 import java.io.File
 import java.io.FileNotFoundException
 
-class ScoreManager() {
+class FilesScoreManager : ScoreManager {
 
   var currentGameScore: ScoreDTO = ScoreDTO()
 
@@ -38,7 +40,7 @@ class ScoreManager() {
     saveScoreboard()
   }
 
-  fun addAsteroidHitPoints(asteroid: Asteroid) {
+  override fun addAsteroidHitPoints(asteroid: Asteroid) {
     this.currentGameScore.points += asteroid.mass / asteroid.radius
     this.currentGameScore.numberOfDestroyedAsteroids++
 

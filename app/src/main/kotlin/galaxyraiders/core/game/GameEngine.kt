@@ -1,7 +1,7 @@
 package galaxyraiders.core.game
 
 import galaxyraiders.Config
-import galaxyraiders.core.score.ScoreManager
+import galaxyraiders.ports.persistence.ScoreManager
 import galaxyraiders.ports.RandomGenerator
 import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand

@@ -1,7 +1,9 @@
 package galaxyraiders.helpers
 
+import galaxyraiders.core.game.Asteroid
 import galaxyraiders.core.game.SpaceField
 import galaxyraiders.ports.RandomGenerator
+import galaxyraiders.ports.persistence.ScoreManager
 import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
@@ -86,4 +88,9 @@ class ControllerSpy : Controller {
     if (playerCommands.isEmpty()) return null
     return playerCommands.remove()
   }
+}
+
+class ScoreManagerSpy : ScoreManager {
+  override fun addAsteroidHitPoints(asteroid: Asteroid) = Unit
+
 }

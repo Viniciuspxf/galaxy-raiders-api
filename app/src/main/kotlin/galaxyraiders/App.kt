@@ -5,7 +5,7 @@ import galaxyraiders.adapters.BasicRandomGenerator
 import galaxyraiders.adapters.tui.TextUserInterface
 import galaxyraiders.adapters.web.WebUserInterface
 import galaxyraiders.core.game.GameEngine
-import galaxyraiders.core.score.ScoreManager
+import galaxyraiders.adapters.persistence.FilesScoreManager
 import kotlin.concurrent.thread
 import kotlin.random.Random
 
@@ -28,10 +28,10 @@ fun main() {
 
   val (controller, visualizer) = ui.build()
 
-  val scoreManager = ScoreManager()
+  val filesScoreManager = FilesScoreManager()
 
   val gameEngine = GameEngine(
-    generator, controller, visualizer, scoreManager
+    generator, controller, visualizer, filesScoreManager
   )
 
   thread { gameEngine.execute() }
