@@ -1,17 +1,20 @@
 package galaxyraiders.core.game
 
+import galaxyraiders.core.physics.Point2D
+import galaxyraiders.core.physics.Vector2D
 import galaxyraiders.helpers.AverageValueGeneratorStub
 import galaxyraiders.helpers.ControllerSpy
 import galaxyraiders.helpers.MaxValueGeneratorStub
 import galaxyraiders.helpers.MinValueGeneratorStub
 import galaxyraiders.helpers.VisualizerSpy
+import galaxyraiders.helpers.ScoreManagerSpy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import kotlin.test.*
 
 @DisplayName("Given a game engine")
 class GameEngineTest {
@@ -20,23 +23,27 @@ class GameEngineTest {
   private val minGenerator = MinValueGeneratorStub()
   private val controllerSpy = ControllerSpy()
   private val visualizerSpy = VisualizerSpy()
+  private val scoreManager = ScoreManagerSpy()
 
   private val normalGame = GameEngine(
     generator = avgGenerator,
     controller = controllerSpy,
     visualizer = visualizerSpy,
+    scoreManager = scoreManager,
   )
 
   private val easyGame = GameEngine(
     generator = maxGenerator,
     controller = controllerSpy,
     visualizer = visualizerSpy,
+    scoreManager = scoreManager,
   )
 
   private val hardGame = GameEngine(
     generator = minGenerator,
     controller = controllerSpy,
     visualizer = visualizerSpy,
+    scoreManager = scoreManager,
   )
 
   @Test
@@ -47,6 +54,7 @@ class GameEngineTest {
       { assertEquals(avgGenerator, normalGame.generator,) },
       { assertEquals(controllerSpy, normalGame.controller) },
       { assertEquals(visualizerSpy, normalGame.visualizer) },
+      { assertEquals(scoreManager, normalGame.scoreManager) },
     )
   }
 
@@ -125,6 +133,38 @@ class GameEngineTest {
     assertNotEquals(asteroidsInitialVelocity, asteroidsFinalVelocity)
   }
 
+  @ParameterizedTest
+  @MethodSource("provideMissileCollidingWithAsteroidArguments")
+  fun `it handle missile hitting an asteroid`(first: SpaceObject, second: SpaceObject) {
+    val numberOfExplosions = hardGame.field.explosions.size
+    hardGame.handleAsteroidDestruction(first, second)
+
+    assertAll(
+      "GameEngine should destroy missile and asteroid",
+      { assertTrue(first.destroyed) },
+      { assertTrue(second.destroyed) },
+      { assertEquals(numberOfExplosions + 1, hardGame.field.explosions.size) },
+    )
+  }
+
+  @Test
+  fun `it does not destroy two asteroids colliding`() {
+    hardGame.generateAsteroids()
+    val firstAsteroid = hardGame.field.asteroids.last()
+
+    hardGame.generateAsteroids()
+    val secondAsteroid = hardGame.field.asteroids.last()
+
+
+    hardGame.handleCollisions()
+
+    assertAll(
+      { assertFalse(firstAsteroid.destroyed) },
+      { assertFalse(secondAsteroid.destroyed) },
+    )
+
+  }
+
   @Test
   fun `it can move its space objects`() {
     hardGame.field.generateAsteroid()
@@ -140,6 +180,10 @@ class GameEngineTest {
     val missile = hardGame.field.missiles[0]
     val expectedMissilePosition = missile.center + missile.velocity
 
+    hardGame.field.generateExplosion(asteroid)
+    val explosion = hardGame.field.explosions[0]
+    val expectedExplosionPosition = explosion.center + explosion.velocity
+
     hardGame.moveSpaceObjects()
 
     assertAll(
@@ -147,6 +191,7 @@ class GameEngineTest {
       { assertEquals(expectedShipPosition, ship.center) },
       { assertEquals(expectedAsteroidPosition, asteroid.center) },
       { assertEquals(expectedMissilePosition, missile.center) },
+      { assertEquals(expectedExplosionPosition, explosion.center) },
     )
   }
 
@@ -235,6 +280,20 @@ class GameEngineTest {
       { assertEquals(0, controllerSpy.playerCommands.size) },
       { assertEquals(expectedNumRenders, visualizerSpy.numRenders) },
       { assertTrue(hardGame.field.asteroids.size <= numPlayerCommands - 1) },
+    )
+  }
+
+  private companion object {
+    @JvmStatic
+    fun provideMissileCollidingWithAsteroidArguments() = listOf(
+      Arguments.of(
+        Asteroid(Point2D(1.0, 1.2), Vector2D(1.0, 1.2), 1.2, 1.3),
+        Missile(Point2D(1.0, 1.2), Vector2D(1.0, 1.2), 1.2, 1.3),
+      ),
+      Arguments.of(
+        Missile(Point2D(1.0, 1.2), Vector2D(1.0, 1.2), 1.2, 1.3),
+        Asteroid(Point2D(1.0, 1.2), Vector2D(1.0, 1.2), 1.2, 1.3),
+      )
     )
   }
 }

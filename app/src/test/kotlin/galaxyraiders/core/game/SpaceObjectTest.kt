@@ -79,4 +79,14 @@ class SpaceObjectTest {
 
     assertFalse(so.inBoundaries(boundaryX, boundaryY))
   }
+
+  @Test
+  fun `it begins not destroyed `() {
+    assertFalse(so.destroyed)
+  }
+  @Test
+  fun `it can be destroyed `() {
+    so.destroy()
+    assertTrue(so.destroyed)
+  }
 }

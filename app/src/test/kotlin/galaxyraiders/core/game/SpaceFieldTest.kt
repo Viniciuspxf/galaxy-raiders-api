@@ -81,6 +81,15 @@ class SpaceFieldTest {
   }
 
   @Test
+  fun `it starts with no explosions`() {
+    assertAll(
+      "SpaceField should initialize an empty list of explosions",
+      { assertNotNull(spaceField.explosions) },
+      { assertEquals(0, spaceField.explosions.size) },
+    )
+  }
+
+  @Test
   fun `it has a list of objects with ship, missiles and asteroids`() {
     val ship = spaceField.ship
 
@@ -218,6 +227,20 @@ class SpaceFieldTest {
   }
 
   @Test
+  fun `it can move its explosions`() {
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(asteroid)
+    val explosion = spaceField.explosions.last()
+    val expectedExplosionPosition = explosion.center + explosion.velocity
+
+    spaceField.moveExplosions()
+
+    assertEquals(expectedExplosionPosition, explosion.center)
+  }
+
+  @Test
   fun `it can generate a new missile`() {
     val numMissiles = spaceField.missiles.size
     spaceField.generateMissile()
@@ -258,6 +281,25 @@ class SpaceFieldTest {
     spaceField.generateAsteroid()
 
     assertEquals(numAsteroids + 1, spaceField.asteroids.size)
+  }
+
+  @Test
+  fun `it can generate a new explosion with asteroid position, velocity and radius `() {
+    val numExplosions = spaceField.explosions.size
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(asteroid)
+    val explosion = spaceField.explosions.last()
+
+    assertAll(
+      "SpaceField creates a new explosion based on an asteroid",
+      { assertEquals(numExplosions + 1, spaceField.explosions.size) },
+      { assertEquals(asteroid.center, explosion.center) },
+      { assertEquals(asteroid.velocity, explosion.velocity) },
+      { assertEquals(asteroid.radius, explosion.radius) },
+    )
   }
 
   @ParameterizedTest(name = "({0})")
@@ -334,6 +376,18 @@ class SpaceFieldTest {
   }
 
   @Test
+  fun `it can remove destroyed missiles`() {
+    spaceField.generateMissile()
+
+    val missile = spaceField.missiles.last()
+
+    missile.destroy()
+    spaceField.trimMissiles()
+
+    assertEquals(-1, spaceField.missiles.indexOf(missile))
+  }
+
+  @Test
   fun `it does not remove missiles inside its boundary`() {
     spaceField.generateMissile()
 
@@ -365,6 +419,18 @@ class SpaceFieldTest {
   }
 
   @Test
+  fun `it can remove destroyed asteroids`() {
+    spaceField.generateAsteroid()
+
+    val asteroid = spaceField.asteroids.last()
+
+    asteroid.destroy()
+    spaceField.trimAsteroids()
+
+    assertEquals(-1, spaceField.asteroids.indexOf(asteroid))
+  }
+
+  @Test
   fun `it does not remove asteroids inside its boundary`() {
     spaceField.generateAsteroid()
 
@@ -376,6 +442,55 @@ class SpaceFieldTest {
 
     assertNotEquals(-1, spaceField.asteroids.indexOf(asteroid))
   }
+
+  @Test
+  fun `it can remove explosions outside its boundary`() {
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(asteroid)
+    val explosion = spaceField.explosions.last()
+
+
+    val distanceToBottomBorder = explosion.center.y - spaceField.boundaryY.start
+    val repetitionsToGetOutSpaceField = Math.ceil(
+      distanceToBottomBorder / Math.abs(explosion.velocity.dy)
+    ).toInt()
+
+    repeat(repetitionsToGetOutSpaceField) { explosion.move() }
+
+    spaceField.cleanExplosions()
+
+    assertEquals(-1, spaceField.explosions.indexOf(explosion))
+  }
+
+  @Test
+  fun `it can remove expired explosions`() {
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(asteroid)
+    val explosion = spaceField.explosions.last()
+
+    explosion.startDateTime = explosion.startDateTime.minusSeconds(6)
+    spaceField.cleanExplosions()
+
+    assertEquals(-1, spaceField.explosions.indexOf(explosion))
+  }
+
+  @Test
+  fun `it does not remove explosions inside its boundary`() {
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(asteroid)
+    val explosion = spaceField.explosions.last()
+
+    spaceField.cleanExplosions()
+
+    assertNotEquals(-1, spaceField.explosions.indexOf(explosion))
+  }
+
 
   private companion object {
     @JvmStatic
