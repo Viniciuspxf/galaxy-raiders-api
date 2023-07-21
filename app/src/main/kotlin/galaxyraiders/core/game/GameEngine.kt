@@ -35,7 +35,7 @@ class GameEngine(
     generator = generator
   )
 
-  var playing = true
+  var playing = false
 
   fun execute() {
     while (true) {
@@ -74,8 +74,21 @@ class GameEngine(
           this.field.generateMissile()
         PlayerCommand.PAUSE_GAME ->
           this.playing = !this.playing
+        PlayerCommand.START_GAME ->
+          this.startGame()
+        PlayerCommand.EXIT_GAME ->
+          this.endGame()
       }
     }
+  }
+
+  private fun startGame() {
+    this.playing = true
+    this.scoreManager.addScoreBoard()
+  }
+
+  private fun endGame() {
+    this.playing = false
   }
 
   fun updateSpaceObjects() {

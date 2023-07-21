@@ -9,7 +9,7 @@ import java.io.FileNotFoundException
 
 class FilesScoreManager : ScoreManager {
 
-  var currentGameScore: ScoreDTO = ScoreDTO()
+  lateinit var currentGameScore: ScoreDTO
 
   var scoreboard: List<ScoreDTO>
 
@@ -33,11 +33,21 @@ class FilesScoreManager : ScoreManager {
         MutableList::class.java, ScoreDTO::class.java))
     }
     catch (exception: FileNotFoundException) {
-      scoreboard = emptyList()
+      this.scoreboard = emptyList()
     }
 
+    saveScoreboard()
+  }
+
+  override fun addScoreBoard() {
+    currentGameScore = ScoreDTO()
     this.scoreboard += currentGameScore
     saveScoreboard()
+  }
+
+  override fun getLeaderBoard(): List<ScoreDTO> {
+    val sortedScoreboard = scoreboard.sortedByDescending { it.points }
+    return if (sortedScoreboard.size > 2) sortedScoreboard.slice(0..2) else sortedScoreboard
   }
 
   override fun addAsteroidHitPoints(asteroid: Asteroid) {
@@ -50,9 +60,7 @@ class FilesScoreManager : ScoreManager {
 
   private fun saveLeaderboard() {
     val objectMapper = ObjectMapper()
-    val sortedScoreboard = scoreboard.sortedByDescending { it.points }
-    val leaderboard = if (scoreboard.size > 2) sortedScoreboard.slice(0..2) else scoreboard
-    objectMapper.writeValue(leaderboardFile, leaderboard)
+    objectMapper.writeValue(leaderboardFile, getLeaderBoard())
   }
 
   private fun saveScoreboard() {

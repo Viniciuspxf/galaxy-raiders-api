@@ -8,6 +8,8 @@ interface Controller {
     MOVE_SHIP_RIGHT,
     LAUNCH_MISSILE,
     PAUSE_GAME,
+    START_GAME,
+    EXIT_GAME
   }
 
   fun nextPlayerCommand(): PlayerCommand?
