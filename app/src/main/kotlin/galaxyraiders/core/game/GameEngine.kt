@@ -57,6 +57,7 @@ class GameEngine(
     this.processPlayerInput()
     this.updateSpaceObjects()
     this.renderSpaceField()
+    this.updateLeaderboard()
   }
 
   fun processPlayerInput() {
@@ -152,6 +153,10 @@ class GameEngine(
 
   fun renderSpaceField() {
     this.visualizer.renderSpaceField(this.field)
+  }
+
+  fun updateLeaderboard() {
+    this.visualizer.setLeaderboard(this.scoreManager.getLeaderBoard())
   }
 }
 

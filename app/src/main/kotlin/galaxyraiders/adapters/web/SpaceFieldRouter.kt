@@ -5,6 +5,7 @@ import galaxyraiders.core.game.Missile
 import galaxyraiders.core.game.SpaceField
 import galaxyraiders.core.game.SpaceShip
 import galaxyraiders.core.game.Explosion
+import galaxyraiders.core.score.ScoreDTO
 import galaxyraiders.ports.ui.Visualizer
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup
@@ -21,14 +22,25 @@ class SpaceFieldRouter : Router, Visualizer {
   var dto: SpaceFieldDTO? = null
     private set
 
+  var leaderboard: List<ScoreDTO> = emptyList()
+    private set
+
   override val path = "/space-field"
 
   override val endpoints = EndpointGroup {
     get("/", ::getSpaceField)
+    get("/leaderboard", ::getLeaderboard)
   }
 
+  private fun getLeaderboard(ctx: Context) {
+    ctx.json(this.leaderboard)
+  }
   private fun getSpaceField(ctx: Context) {
     ctx.json(this.dto ?: "{}")
+  }
+
+  override fun setLeaderboard(leaderboard : List<ScoreDTO>) {
+    this.leaderboard = leaderboard
   }
 
   override fun renderSpaceField(field: SpaceField) {

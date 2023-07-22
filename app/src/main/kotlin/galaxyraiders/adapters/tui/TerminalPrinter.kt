@@ -2,6 +2,7 @@ package galaxyraiders.adapters.tui
 
 import galaxyraiders.core.game.SpaceField
 import galaxyraiders.core.physics.Point2D
+import galaxyraiders.core.score.ScoreDTO
 import galaxyraiders.ports.ui.Visualizer
 import java.io.PrintStream
 
@@ -35,5 +36,8 @@ class TerminalPrinter(
     }
 
     output.println("======")
+  }
+
+  override fun setLeaderboard(leaderboard: List<ScoreDTO>) {
   }
 }
